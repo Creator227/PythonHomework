@@ -13,5 +13,5 @@ setup(
     license='MIT',
     packages=['pycalc'],
     zip_safe='False',
-    entry_points={'console_scripts': ['pycalc=rpn_pycalc.__main__:_main']}
+    entry_points={'console_scripts': ['pycalc = pycalc.__main__:_main']}
 )
