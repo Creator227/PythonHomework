@@ -4,15 +4,17 @@ options using reverse-polish-notation algorithm
 """
 import operator
 import re
-from typing import List
 from collections import namedtuple, OrderedDict
 import operator
 import re
 import sys
 
 
-def import_modules(*_modules):
+def _import_modules(*_modules):
     """
+    Importing users modules into global variable
+    which is used by find_attribute function
+    :param _modules - tuple of modules names
     """
     global modules
     modules = _modules
@@ -23,7 +25,7 @@ def import_modules(*_modules):
             raise ImportError("Module not found:" + module)
 
 
-def find_attribute(attribute_name):
+def _find_attribute(attribute_name):
     """
     Find attribute in _modules.
     If attribute don't have dot in it's name,
@@ -31,23 +33,24 @@ def find_attribute(attribute_name):
     If attribute have dot in it's name,
     then function will try to get exact attribute.
     :param attribute_name: Name of searching attribute
-    :return: Object of attribute
+    :return Object of attribute
     """
-    attr_name = attribute_name.split('.')
-    if len(attr_name) == 1:
+    attribute_names = attribute_name.split('.')
+    if len(attribute_names) == 1:
         for module in modules:
-            attribute = getattr(sys.modules[module], attr_name[0], None)
-            if attribute is None:
-                continue
-            return attribute
+            attribute = getattr(sys.modules[module], attribute_names[0], None)
+            if attribute:
+                return attribute
     else:
+        # search attribute im submodules
         if attribute_name[0] in modules:
-            attr = getattr(sys.modules[__name__], attr_name[0], None)
-            for part in attr_name[1:]:
-                attr = getattr(attr, part, None)
-            if attr is not None:
-                return attr
-    raise ArithmeticError("Unknown function or constant:" + str(attr_name))
+            attribute = getattr(sys.modules[__name__], attribute_names[0], None)
+            for part in attribute_names[1:]:
+                attribute = getattr(attribute, part, None)
+            if attribute:
+                return attribute
+
+    raise ArithmeticError("Unknown function or constant:" + str(attribute_names))
 
 
 _handler = namedtuple('handler', 'regex, operator, precedence')
@@ -75,8 +78,8 @@ _HANDLERS_DICT = OrderedDict([
     ('RightBracket', _handler(re.compile(r'\)'), str, 0)),
     ('Comma', _handler(re.compile(r','), str, 8)),
     ('Space', _handler(re.compile(r'\s+'), None, None)),
-    ('Function', _handler(re.compile(r'[\w]+\('), find_attribute, 1)),
-    ('Constant', _handler(re.compile(r'[\w]+'), find_attribute, 9)),
+    ('Function', _handler(re.compile(r'[\w]+\('), _find_attribute, 1)),
+    ('Constant', _handler(re.compile(r'[\w]+'), _find_attribute, 9)),
     ('Arguments', _handler(None, bool, 1)),
     ('UnaryMinus', _handler(None, lambda x: x * -1, 6)),
     ('UnaryPlus', _handler(None, lambda x: x, 6)),
@@ -117,7 +120,7 @@ def _tokenize(expression: str) -> list:
     tokens = list()
     while expression:
         # tokenize starts from left characters in expression
-        for (token_type, (regex, _, _)) in _HANDLERS_DICT.items():
+        for token_type, (regex, _, _) in _HANDLERS_DICT.items():
             if regex is not None:
                 match = regex.match(expression)
                 if match:
@@ -233,7 +236,7 @@ def _rpn_calculate(rpn_queue):
 
 
 def calculator(expression: str, modules=()):
-    import_modules(*modules, 'math', 'builtins')
+    _import_modules(*modules, 'math', 'builtins')
     tokens_expression = _tokenize(expression)
     tokens_expression = _find_unary(tokens_expression)
     rpn_expression = _make_rpn(tokens_expression)
