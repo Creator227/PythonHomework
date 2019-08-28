@@ -12,6 +12,6 @@ setup(
     url='https://github.com/Creator227/PythonHomework',
     license='MIT',
     packages=['pycalc'],
-    zip_safe='True',
+    zip_safe=True,
     entry_points={'console_scripts': ['pycalc = pycalc.__main__:_main']}
 )
