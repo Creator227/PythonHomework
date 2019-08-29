@@ -182,8 +182,8 @@ def _make_rpn(tokens: list):
             # it binds less tightly than unary operators on its right.
             stack.append(token)
         elif handler.precedence == _get_handler(stack[-1]).precedence and \
-                token.type in {'POWER', 'UnaryMinus', 'UnaryPlus'}:
-            # Right-to-Left association operations
+                token.type in {'Power', 'UnaryMinus', 'UnaryPlus'}:
+            # Association for operators of power, UMinus & UPlus - Right right ^ is more important
             stack.append(token)
         elif handler.precedence <= _get_handler(stack[-1]).precedence:
             while stack:
@@ -220,18 +220,21 @@ def _rpn_calculate(rpn_queue):
                 # operand = rpn_stack.pop()
                 rpn_stack.append(handler.operator(rpn_stack.pop()))
             except IndexError:
-                raise ArithmeticError("Calculation error")
+                raise ArithmeticError('Calculation error')
         else:
             try:
                 operand_2, operand_1 = rpn_stack.pop(), rpn_stack.pop()
                 rpn_stack.append(handler.operator(operand_1, operand_2))
             except ZeroDivisionError:
-                raise ArithmeticError("Division by zero")
+                raise ArithmeticError('Division by zero')
             except IndexError:
-                raise ArithmeticError("Calculation error")
-    result = rpn_stack.pop()
+                raise ArithmeticError('Calculation error')
+    try:
+        result = rpn_stack.pop()
+    except IndexError:
+        raise ArithmeticError('Calculation error')
     if rpn_stack:
-        raise ArithmeticError("Calculation error")
+            raise ArithmeticError("Calculation error")
     return result
 
 
