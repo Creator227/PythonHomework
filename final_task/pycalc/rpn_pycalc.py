@@ -94,6 +94,7 @@ def _get_handler(token):
 def _prepare_expression(expression: str) -> str:
     # for expressions with multiple unary operators
     # for -----2
+    expression = re.sub(r'(\(\.)', r'(0.', expression)
     while re.search(r'(- )|( -)', expression):
         expression = re.sub(r'(- )|( -)', r'-', expression)
     while re.search(r'(\+ )|( \+)', expression):
@@ -140,8 +141,7 @@ def _find_unary(tokens: list) -> list:
     """ All pluses and minuses in input list of tokens are binary
     This function replace it with unary """
     no_unary = {'Integer', 'Float', 'Constant', 'RightBracket'}
-    for token in tokens:
-        index = tokens.index(token)
+    for index, token in enumerate(tokens):
         if token.type in {'Plus', 'Minus'} and (index == 0 or tokens[index-1][0] not in no_unary):
             tokens[index] = _token('UnaryPlus', '+') if token.type == 'Plus' else _token('UnaryMinus', '-')
     return tokens
@@ -221,7 +221,6 @@ def _rpn_calculate(rpn_queue):
             rpn_stack.append(handler.operator(token.value[:-1])(*function_args))
         elif token.type in {'UnaryPlus', 'UnaryMinus'}:
             try:
-                # operand = rpn_stack.pop()
                 rpn_stack.append(handler.operator(rpn_stack.pop()))
             except IndexError:
                 raise ArithmeticError('Calculation error')
@@ -249,4 +248,3 @@ def calculator(expression: str, modules=()):
     tokens_expression = _find_unary(tokens_expression)
     rpn_expression = _make_rpn(tokens_expression)
     return _rpn_calculate(rpn_expression)
-
