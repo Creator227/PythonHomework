@@ -94,7 +94,10 @@ def _get_handler(token):
 def _prepare_expression(expression: str) -> str:
     # for expressions with multiple unary operators
     # for -----2
-    expression = expression.replace(' ', '')
+    while re.search(r'(- )|( -)', expression):
+        expression = re.sub(r'(- )|( -)', r'-', expression)
+    while re.search(r'(\+ )|( \+)', expression):
+        expression = re.sub(r'(\+ )|( \+)', r'+', expression)
     flag = False
     while not flag:
         flag = True
@@ -246,3 +249,4 @@ def calculator(expression: str, modules=()):
     tokens_expression = _find_unary(tokens_expression)
     rpn_expression = _make_rpn(tokens_expression)
     return _rpn_calculate(rpn_expression)
+
