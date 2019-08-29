@@ -59,8 +59,8 @@ _token = namedtuple('token', 'type, value')
 # Dict of handlers for all possible types of params
 # provides regular expression to find this type in input expression
 _HANDLERS_DICT = OrderedDict([
-    ('Integer', _handler(re.compile(r'\d+'), int, 9)),
     ('Float', _handler(re.compile(r'\d*\.\d+'), float, 9)),
+    ('Integer', _handler(re.compile(r'\d+'), int, 9)),
     ('Plus', _handler(re.compile(r'\+'), operator.add, 4)),
     ('Minus', _handler(re.compile(r'-'), operator.sub, 4)),
     ('Power', _handler(re.compile(r'(\^)|(\*\*)'), operator.pow, 7)),
@@ -135,7 +135,7 @@ def _tokenize(expression: str) -> list:
 def _find_unary(tokens: list) -> list:
     """ All pluses and minuses in input list of tokens are binary
     This function replace it with unary """
-    no_unary = {'Integer', 'Float', 'Const', 'RightBracket'}
+    no_unary = {'Integer', 'Float', 'Constant', 'RightBracket', 'Function'}
     for token in tokens:
         index = tokens.index(token)
         if token.type in {'Plus', 'Minus'} and (index == 0 or tokens[index-1][0] not in no_unary):
@@ -237,10 +237,10 @@ def _rpn_calculate(rpn_queue):
 
 def calculator(expression: str, modules=()):
     _import_modules(*modules, 'math', 'builtins')
+    expression = _prepare_expression(expression)
     tokens_expression = _tokenize(expression)
     tokens_expression = _find_unary(tokens_expression)
     rpn_expression = _make_rpn(tokens_expression)
     return _rpn_calculate(rpn_expression)
 
-
-
+print(calculator('round(123.4567890)'))
