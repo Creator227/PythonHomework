@@ -243,4 +243,3 @@ def calculator(expression: str, modules=()):
     rpn_expression = _make_rpn(tokens_expression)
     return _rpn_calculate(rpn_expression)
 
-print(calculator('round(123.4567890)'))
