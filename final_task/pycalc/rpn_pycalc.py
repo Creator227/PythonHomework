@@ -103,7 +103,7 @@ def _prepare_expression(expression: str) -> str:
     while not flag:
         flag = True
         while re.search(r'--', expression):
-            expression = re.sub(r'--', r'-', expression)
+            expression = re.sub(r'--', r'+', expression)
             flag = False
         while re.search(r'(\+-)|(-\+)', expression):
             expression = re.sub(r'(\+-)|(-\+)', r'-', expression)
@@ -248,3 +248,5 @@ def calculator(expression: str, modules=()):
     tokens_expression = _find_unary(tokens_expression)
     rpn_expression = _make_rpn(tokens_expression)
     return _rpn_calculate(rpn_expression)
+
+print(calculator('10*e^0*log10(.4 -5/ -0.1-10) - -abs(-53/10) + -5'))
