@@ -135,7 +135,7 @@ def _tokenize(expression: str) -> list:
 def _find_unary(tokens: list) -> list:
     """ All pluses and minuses in input list of tokens are binary
     This function replace it with unary """
-    no_unary = {'Integer', 'Float', 'Constant', 'RightBracket', 'Function'}
+    no_unary = {'Integer', 'Float', 'Constant', 'RightBracket'}
     for token in tokens:
         index = tokens.index(token)
         if token.type in {'Plus', 'Minus'} and (index == 0 or tokens[index-1][0] not in no_unary):
@@ -245,3 +245,4 @@ def calculator(expression: str, modules=()):
     tokens_expression = _find_unary(tokens_expression)
     rpn_expression = _make_rpn(tokens_expression)
     return _rpn_calculate(rpn_expression)
+
