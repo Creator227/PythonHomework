@@ -249,4 +249,3 @@ def calculator(expression: str, modules=()):
     rpn_expression = _make_rpn(tokens_expression)
     return _rpn_calculate(rpn_expression)
 
-print(calculator('10*e^0*log10(.4 -5/ -0.1-10) - -abs(-53/10) + -5'))
